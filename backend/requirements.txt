@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+boto3
+python-docx
+pdfplumber
+sentence-transformers
+qdrant-client
+httpx
+python-dotenv
+latex
