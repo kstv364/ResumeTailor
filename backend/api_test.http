@@ -1,0 +1,20 @@
+### Health Check
+GET http://localhost:8000/health
+
+### Upload Resume
+POST http://localhost:8000/upload/
+Content-Type: application/json
+
+{
+"id": "b3e1c2d4-5678-4f9a-8a2b-123456789abc",
+  "file_url": "https://raw.githubusercontent.com/kstv364/Resume/e22164375f41d4c313b5b65fd1a09c98f6ed426a/Kaustav-Resume.pdf"
+}
+
+### Tailor Resume
+POST http://localhost:8000/tailor/
+Content-Type: application/json
+
+{
+  "resume_id": "123",
+  "job_description": "Looking for a software engineer with experience in Python, FastAPI, and AWS cloud deployment."
+}

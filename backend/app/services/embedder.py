@@ -1,5 +1,5 @@
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import PointStruct
+from qdrant_client.http.models import PointStruct, VectorParams, Distance
 from sentence_transformers import SentenceTransformer
 from app.utils import VECTOR_DB_URL
 import sqlite3
@@ -12,6 +12,13 @@ conn = sqlite3.connect('metadata.db', check_same_thread=False)
 cur = conn.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS resumes(id TEXT PRIMARY KEY, text TEXT)')
 conn.commit()
+
+# Ensure the collection exists in Qdrant
+if COLLECTION not in [c.name for c in client.get_collections().collections]:
+    client.create_collection(
+        collection_name=COLLECTION,
+        vectors_config=VectorParams(size=model.get_sentence_embedding_dimension(), distance=Distance.COSINE)
+    )
 
 
 def store_resume(resume_id: str, text: str):
