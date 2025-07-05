@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OLLAMA_URL=http://ollama:11434/v1/chat/completions
+      - OLLAMA_URL=http://ollama:11434/api/generate
       - OLLAMA_MODEL=llama2
       - VECTOR_DB_URL=vector_db:6333
       - S3_ENDPOINT=http://minio:9000
@@ -36,7 +36,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - "1407:11434"
+      - "11434:11434"
     volumes:
       - ./models:/models  # your local model storage
 

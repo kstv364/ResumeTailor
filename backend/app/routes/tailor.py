@@ -10,7 +10,7 @@ async def tailor_resume(body: TailorRequest):
         # fetch latest resume text
         resume_text = embedder.fetch_resume(body.resume_id)
         # generate updated LaTeX based on previous template and new JD
-        updated_latex = llm_client.generate_latex_resume(resume_text, body.job_description)
+        updated_latex = await llm_client.generate_latex_resume(resume_text, body.job_description)
         # create new version linked to this JD
         version_id = versioning.create_version(body.resume_id, updated_latex, job_desc_id=body.job_description)
         metadata = versioning.get_metadata(body.resume_id, version_id)

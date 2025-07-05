@@ -14,12 +14,12 @@ async def _call_ollama(prompt: str) -> str:
     # Ollama API expects a JSON payload similar to OpenAI chat
     payload = {
         "model": OLLAMA_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
+        "prompt": prompt,
         "stream": False
     }
     async with httpx.AsyncClient() as client:
-        resp = await client.post(OLLAMA_URL, json=payload)
+        resp = await client.post(OLLAMA_URL, json=payload, timeout=120)
         resp.raise_for_status()
         data = resp.json()
-        # Ollama returns content under 'choices'[0]['message']['content']
-        return data['choices'][0]['message']['content']
+        # Ollama /api/generate returns the result under 'response'
+        return data['response']

@@ -15,6 +15,6 @@ POST http://localhost:8000/tailor/
 Content-Type: application/json
 
 {
-  "resume_id": "123",
+  "resume_id": "b3e1c2d4-5678-4f9a-8a2b-123456789abc",
   "job_description": "Looking for a software engineer with experience in Python, FastAPI, and AWS cloud deployment."
 }
