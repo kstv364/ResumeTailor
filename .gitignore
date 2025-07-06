@@ -9,6 +9,7 @@ yarn.lock
 # Build output
 dist/
 build/
+**/__pycache__/
 out/
 
 # Environment files
@@ -18,9 +19,9 @@ out/
 # OS generated files
 .DS_Store
 Thumbs.db
+*.db
 
 # IDE files
-.vscode/
 .idea/
 *.suo
 *.ntvs*

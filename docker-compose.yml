@@ -5,8 +5,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OLLAMA_URL=http://ollama:11434/api/generate
-      - OLLAMA_MODEL=llama2
+      - OLLAMA_URL=http://localhost:11434/api/generate
+      - OLLAMA_MODEL=llama3
       - VECTOR_DB_URL=vector_db:6333
       - S3_ENDPOINT=http://minio:9000
       - AWS_ACCESS_KEY_ID=minioadmin
@@ -32,13 +32,6 @@ services:
       MINIO_SECRET_KEY: minioadmin
     volumes:
       - minio_data:/data
-
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ./models:/models  # your local model storage
 
 volumes:
   qdrant_data:
