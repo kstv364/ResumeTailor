@@ -16,7 +16,7 @@ function App() {
     setLoading(true);
     try {
       // 1. Upload resume URL to backend
-      const uploadRes = await fetch('http://localhost:8000/upload/', {
+      const uploadRes = await fetch('/upload/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ file_url: resumeUrl }),
@@ -26,7 +26,7 @@ function App() {
       const resume_id = uploadData.resume_id;
 
       // 2. Send resume_id and JD to /tailor/
-      const tailorRes = await fetch('http://localhost:8000/tailor/', {
+      const tailorRes = await fetch('/tailor/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resume_id, job_description: jobDescription }),
