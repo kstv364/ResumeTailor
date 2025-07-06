@@ -2,13 +2,16 @@ import requests
 import pdfplumber
 from io import BytesIO
 from docx import Document
+from urllib.parse import urlparse
 
 def parse_file(file_url: str) -> str:
     resp = requests.get(file_url)
     data = resp.content
-    if file_url.endswith('.pdf'):
+    # Use urlparse to get the path and check extension
+    path = urlparse(file_url).path
+    if path.endswith('.pdf'):
         return _parse_pdf(data)
-    elif file_url.endswith('.docx'):
+    elif path.endswith('.docx'):
         return _parse_docx(data)
     else:
         raise ValueError("Unsupported file type")
