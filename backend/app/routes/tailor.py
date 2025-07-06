@@ -7,44 +7,46 @@ router = APIRouter()
 
 import re
 
-def improved_clean_latex_response(response: str) -> str:
+def perfect_clean_latex_response(raw_response: str) -> str:
     """
-    Cleans and fixes LLM LaTeX response:
-    - Removes escaped newlines
+    Post-processes the LLM LaTeX response:
+    - Removes markdown code fences
+    - Fixes escaped newlines
     - Converts '*' bullets to '\item'
-    - Wraps '\item' lines correctly inside 'itemize' environments
-    - Cleans redundant spaces
-    - Removes Markdown fences if present
+    - Wraps orphaned bullet points in itemize environments
+    - Leaves existing itemize blocks untouched
+    - Returns valid LaTeX ready for Overleaf
     """
-    # Step 1: Clean Markdown fences if any
-    response = re.sub(r"^```latex", "", response)
-    response = re.sub(r"```$", "", response)
-    response = response.strip()
+    # Step 1: Remove markdown fences
+    latex_code = raw_response.strip()
+    latex_code = re.sub(r"^```latex", "", latex_code)
+    latex_code = re.sub(r"```$", "", latex_code)
+    latex_code = latex_code.strip()
 
-    # Step 2: Replace escaped newlines with actual newlines
-    response = response.replace('\\n', '\n')
+    # Step 2: Replace all \n with actual newlines
+    latex_code = latex_code.replace('\\n', '\n')
 
-    # Step 3: Convert '*' bullets to '\item'
-    response = re.sub(r'^\s*\*\s+', r'\\item ', response, flags=re.MULTILINE)
+    # Step 3: Replace markdown-style bullets '*' with '\item '
+    latex_code = re.sub(r'^\s*\*\s+', r'\\item ', latex_code, flags=re.MULTILINE)
 
-    # Step 4: Wrap all \item sequences inside itemize environments
+    # Step 4: Find and wrap consecutive orphan \item blocks inside itemize environments
     def wrap_items(match):
-        block = match.group(0)
-        return '\\begin{itemize}\n' + block + '\n\\end{itemize}'
+        items_block = match.group(0)
+        return '\\begin{itemize}\n' + items_block.strip() + '\n\\end{itemize}'
 
-    # This finds blocks of consecutive \item lines and wraps them
-    response = re.sub(r'(?:\\item .+\n)+', wrap_items, response)
+    # Match any sequence of consecutive \item lines (allowing blank lines in between)
+    latex_code = re.sub(r'(?:\\item .+\n)+', wrap_items, latex_code)
 
-    # Step 5: Clean extra spaces
-    response = re.sub(r' +', ' ', response)
+    # Step 5: Clean double spaces
+    latex_code = re.sub(r' +', ' ', latex_code)
 
-    # Step 6: Validate start and end
-    if not response.startswith(r'\documentclass'):
-        raise ValueError("The LaTeX document must start with \\documentclass.")
-    if not response.endswith(r'\end{document}'):
-        raise ValueError("The LaTeX document must end with \\end{document}.")
+    # Step 6: Validate document structure
+    if not latex_code.startswith(r'\documentclass'):
+        raise ValueError("The document does not start with \\documentclass.")
+    if not latex_code.endswith(r'\end{document}'):
+        raise ValueError("The document does not end with \\end{document}.")
 
-    return response
+    return latex_code
 
 
 @router.post("/", response_model=TailorResponse)
@@ -59,7 +61,7 @@ async def tailor_resume(body: TailorRequest):
         with open("debug_resume.md", "w") as f:
             f.write(llm_response)
         # create new version linked to this JD
-        updated_latex = improved_clean_latex_response(llm_response)
+        updated_latex = perfect_clean_latex_response(llm_response)
         version_id = versioning.create_version(body.resume_id, updated_latex, job_desc_id=body.job_description)
         metadata = versioning.get_metadata(body.resume_id, version_id)
         return TailorResponse(
