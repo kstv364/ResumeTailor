@@ -1,13 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
+    cors: true, // enables CORS in dev
     proxy: {
-      '/upload': 'http://localhost:8000',
-      '/tailor': 'http://localhost:8000',
+      '/upload': {
+        target: 'http://127.0.0.1:8000',  // base URL only
+        changeOrigin: true,
+        // no rewrite → keeps the `/upload` prefix intact
+      },
+      '/tailor': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        // same idea for tailor if needed
+      },
     },
   },
 })
