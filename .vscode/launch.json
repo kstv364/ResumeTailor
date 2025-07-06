@@ -11,10 +11,13 @@
       "module": "uvicorn",
       "args": [
         "app.main:app",
+        "--port",
+        "5000",      
         "--reload"
       ],
       "cwd": "${workspaceFolder}/backend",
-      "jinja": true
+      "jinja": true,
+      "python": "/home/ubuntu/miniconda3/bin/python",
     }
   ]
 }
