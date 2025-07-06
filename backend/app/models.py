@@ -12,5 +12,6 @@ class TailorRequest(BaseModel):
 
 class TailorResponse(BaseModel):
     version_id: str
+    llm_response: str
     latex_resume: str
     metadata: dict
