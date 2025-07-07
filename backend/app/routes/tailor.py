@@ -54,12 +54,9 @@ async def tailor_resume(body: TailorRequest):
     try:
         # fetch latest resume text
         resume_text = embedder.fetch_resume(body.resume_id)
-        # write the resume text to a .md file for debugging
       
         # generate updated LaTeX based on previous template and new JD
         llm_response = await llm_client.generate_latex_resume(resume_text, body.job_description)
-        with open("debug_resume.md", "w") as f:
-            f.write(llm_response)
         # create new version linked to this JD
         updated_latex = perfect_clean_latex_response(llm_response)
         version_id = versioning.create_version(body.resume_id, updated_latex, job_desc_id=body.job_description)

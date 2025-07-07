@@ -4,18 +4,16 @@ import './App.css';
 function App() {
   const [resumeUrl, setResumeUrl] = useState('');
   const [jobDescription, setJobDescription] = useState('');
-  const [llmOutput, setLlmOutput] = useState('');
   const [latexCode, setLatexCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [copySuccess, setCopySuccess] = useState('');
 
   const handleGenerate = async () => {
     setError('');
-    setLlmOutput('');
     setLatexCode('');
     setLoading(true);
     try {
-      // 1. Upload resume URL to backend
       const uploadRes = await fetch('/upload/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -25,7 +23,6 @@ function App() {
       const uploadData = await uploadRes.json();
       const resume_id = uploadData.resume_id;
 
-      // 2. Send resume_id and JD to /tailor/
       const tailorRes = await fetch('/tailor/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,13 +30,18 @@ function App() {
       });
       if (!tailorRes.ok) throw new Error('Failed to tailor resume');
       const tailorData = await tailorRes.json();
-      setLlmOutput(tailorData.llm_response);
       setLatexCode(tailorData.latex_resume);
     } catch (err) {
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(latexCode);
+    setCopySuccess('Copied!');
+    setTimeout(() => setCopySuccess(''), 2000);
   };
 
   return (
@@ -65,19 +67,14 @@ function App() {
         </button>
         {error && <div style={{ color: 'red' }}>{error}</div>}
       </div>
+
       <div className="output-panel">
-        <h2>LLM Output (Raw LaTeX)</h2>
-        <pre className="code-block">
-          <code>{llmOutput}</code>
-        </pre>
-        <h2>Cleaned LaTeX (Copy-Paste Ready)</h2>
-        <pre className="code-block">
+        <div className="code-block">
+          {copySuccess && <div className="copy-success">{copySuccess}</div>}
+          <button onClick={handleCopy} className="copy-button">
+            Copy
+          </button>
           <code>{latexCode}</code>
-        </pre>
-        <h2>Rendered TeX</h2>
-        <div className="rendered-tex">
-          {/* For real rendering, use a library like KaTeX or MathJax. Here, just display as plain text. */}
-          <pre>{latexCode}</pre>
         </div>
       </div>
     </div>
